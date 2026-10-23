@@ -30,4 +30,13 @@ public class ExpenseController {
                 .map(expense -> ResponseEntity.ok(expense))
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @DeleteMapping("/expenses/{id}")
+    public ResponseEntity<Void> deleteExpensesById(@PathVariable Long id){
+        if (!repository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        repository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 }
