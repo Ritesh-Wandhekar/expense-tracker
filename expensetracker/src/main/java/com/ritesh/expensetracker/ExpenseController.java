@@ -1,5 +1,6 @@
 package com.ritesh.expensetracker;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +16,7 @@ public class ExpenseController {
     }
 
     @PostMapping("/expenses")
-    public Expense addExpense(@RequestBody Expense expense) {
+    public Expense addExpense(@Valid @RequestBody Expense expense) {
         return repository.save(expense);
     }
 
@@ -38,5 +39,19 @@ public class ExpenseController {
         }
         repository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @PutMapping("/expenses/{id}")
+    public ResponseEntity<Expense> updateExpense(@PathVariable Long id, @Valid @RequestBody Expense updated) {
+        return repository.findById(id)
+                .map(existing -> {
+                    existing.setCategory(updated.getCategory());
+                    existing.setName(updated.getName());
+                    existing.setAmount(updated.getAmount());
+                    existing.setDate(updated.getDate());
+                    return ResponseEntity.ok(repository.save(existing));
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 }
